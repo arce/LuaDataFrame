@@ -2,13 +2,20 @@ local write = io.write
 require "dataVector"
 require "CSV"
 
-function dataFrame(args)
-  local table = args or {}
+function dataFrame(arg1,arg2)
+  local id = (type(arg1) == "table") and "" or arg1
+  local table = (id == "") and arg1 or arg2 or {}
   local _table = table
-  table = {}
+  table = {oid=id}
+  for k,_ in pairs(_table) do
+    _table[k].oid = table.oid..tostring(k)
+  end
   local metatable = {
     __newindex = function(table,k,v)
       _table[k] = v
+      if table.oid then
+        _table[k].oid = table.oid..tostring(k)
+      end
     end,
     __index = function(table,k)
      return _table[k]
@@ -29,6 +36,7 @@ function dataFrame(args)
 end
 
 function printDataFrame(dfrm)
+  print("oid:",dfrm.oid)
   local names = dfrm.names()
   for i=1,names.size() do
       write(names[i].." ")
@@ -43,7 +51,7 @@ function printDataFrame(dfrm)
 end
 
 function readCSV(file, header, sep)
-  local dfrm = dataFrame()
+  local dfrm = dataFrame(file)
   local fd = io.open(file)
   local line = fd:read()
   local headers = fromCSV(line)
