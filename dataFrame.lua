@@ -6,9 +6,6 @@ function dataFrame(id)
     local table = {}
     local _table = table
     table = {oid=id}
-    for k,_ in pairs(_table) do
-        _table[k].oid = table.oid..tostring(k)
-    end
     local metatable = {
         __newindex = function(table,k,v)
             _table[k] = v
